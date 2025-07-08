@@ -1,0 +1,28 @@
+package components;
+
+var openModalById = templ.NewOnceHandle()
+
+templ Header() {
+	@openModalById.Once() {
+		<script>
+            function openModalById(id) {
+                document.getElementById(id)?.showModal()
+            }
+        </script>
+	}
+	<header>
+		<nav>
+			<ul>
+				<li>
+					<a href="/">Bookmarks</a>
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<button type="button" onclick={ templ.JSFuncCall("openModalById", ADD_BOOKMARK_MODAL) }>Add bookmark</button>
+				</li>
+			</ul>
+			@AddBookmarkModal()
+		</nav>
+	</header>
+}
