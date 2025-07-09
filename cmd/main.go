@@ -3,14 +3,29 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"naqet/bookmarks/infra/database"
 	"naqet/bookmarks/views/pages"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		slog.Error("env variables couldn't be loaded", slog.Any("error", err))
+		os.Exit(1)
+	}
+
+	db := database.Init()
+	if err := database.Migrate(db); err != nil {
+		slog.Error("migration failed", slog.Any("error", err))
+		os.Exit(1)
+	}
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)

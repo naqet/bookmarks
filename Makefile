@@ -6,3 +6,13 @@ live:
 
 live/templ:
 	templ generate --watch --proxy="http://localhost:3000" --open-browser=false --cmd="go run cmd/main.go"
+
+up:
+	docker compose up -d
+
+down:
+	docker compose down
+
+kill:
+	docker compose down -v
+
