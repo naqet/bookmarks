@@ -1,13 +1,11 @@
 package main
 
 import (
-	"context"
 	"log/slog"
 	"naqet/bookmarks/infra/database"
 	"naqet/bookmarks/services/auth"
+	"naqet/bookmarks/services/dashboard"
 	"naqet/bookmarks/services/marks"
-	"naqet/bookmarks/utils"
-	"naqet/bookmarks/views/pages"
 	"net/http"
 	"os"
 
@@ -41,41 +39,11 @@ func main() {
 
 	auth.Init(r, db, vali)
 
+	// Protected
 	r.Group(func(g chi.Router) {
 		g.Use(auth.NewMiddleware(db))
-		g.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			userId, ok := r.Context().Value(utils.USER_ID_CTX_KEY).(string)
-			if !ok {
-				utils.Unauthorized(w)
-				return
-			}
-			marks := []database.Bookmark{}
-			res, err := db.Query("select id, title, url, tags, description, read, created_at from bookmarks where owner_id = $1", userId)
-
-			if err != nil {
-				slog.Error("couldn't prepare query for selecting bookmarks", slog.Any("error", err))
-				utils.InternalServerError(w)
-				return
-			}
-
-			for res.Next() {
-				mark := database.Bookmark{}
-				err := res.Scan(&mark.ID, &mark.Title, &mark.Url, &mark.Tags, &mark.Description, &mark.Read, &mark.CreatedAt)
-
-				if err != nil {
-					slog.Error("couldn't scan bookmark", slog.Any("error", err))
-					utils.InternalServerError(w)
-					return
-				}
-
-				marks = append(marks, mark)
-			}
-
-			if err := pages.Index(marks).Render(context.Background(), w); err != nil {
-				w.Write([]byte("Error"))
-			}
-		})
 		marks.Init(g, db, vali)
+		dashboard.Init(g, db, vali)
 	})
 
 	http.ListenAndServe(":3000", r)

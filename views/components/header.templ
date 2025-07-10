@@ -26,10 +26,8 @@ templ Header() {
 						<summary>
 							Account
 						</summary>
-						<ul dir="rtl">
-							<li><a href="#">Profile</a></li>
-							<li><a href="#">Settings</a></li>
-							<li><a href="#">Security</a></li>
+						<ul>
+							<li><a href="/settings">Settings</a></li>
 							<li><button hx-post="/api/auth/logout" class="outline">Logout</button></li>
 						</ul>
 					</details>

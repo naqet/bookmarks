@@ -1,10 +1,8 @@
 package layouts;
 
-import "naqet/bookmarks/views/components"
-
 templ Root() {
 	<!DOCTYPE html>
-	<html lang="pl">
+	<html lang="en">
 		<head>
 			<meta charset="UTF-8"/>
 			<title>Bookmarks</title>
@@ -17,7 +15,6 @@ templ Root() {
 			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
 		</head>
 		<body class="container" hx-ext="response-targets">
-			@components.Header()
 			{ children... }
 		</body>
 	</html>

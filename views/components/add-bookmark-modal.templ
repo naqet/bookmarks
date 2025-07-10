@@ -11,7 +11,7 @@ templ AddBookmarkModal() {
 					<button aria-label="Close" rel="prev"></button>
 				</form>
 			</header>
-			<form hx-trigger="submit" hx-post="/api/marks">
+			<form hx-trigger="submit" hx-post="/api/marks" hx-target-error="#errors">
 				<label>
 					URL
 					<input type="url" name="url" required hx-get="/api/marks/get-info" hx-trigger="input changed delay:500ms" hx-target-error="#url-helper" hx-target="#page-info" aria-describedby="url-helper"/>
@@ -25,6 +25,7 @@ templ AddBookmarkModal() {
 					@AddBookmarkModalPageInfo("", "")
 				</fieldset>
 				<button type="submit" style="margin-bottom: 0;">Add</button>
+                <small id="errors" style="display:block;"></small>
 			</form>
 		</article>
 	</dialog>

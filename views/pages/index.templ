@@ -5,7 +5,7 @@ import "naqet/bookmarks/infra/database"
 import "naqet/bookmarks/views/components"
 
 templ Index(marks []database.Bookmark) {
-	@layouts.Root() {
+	@layouts.Dashboard() {
 		<input name="query" type="search" placeholder="Search" hx-trigger="input changed delay:500ms" hx-target="#list" hx-get="/api/marks"/>
 		<hr/>
 		<div id="list">
