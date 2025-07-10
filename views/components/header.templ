@@ -21,6 +21,19 @@ templ Header() {
 				<li>
 					<button type="button" onclick={ templ.JSFuncCall("openModalById", ADD_BOOKMARK_MODAL) }>Add bookmark</button>
 				</li>
+				<li>
+					<details class="dropdown">
+						<summary>
+							Account
+						</summary>
+						<ul dir="rtl">
+							<li><a href="#">Profile</a></li>
+							<li><a href="#">Settings</a></li>
+							<li><a href="#">Security</a></li>
+							<li><button hx-post="/api/auth/logout" class="outline">Logout</button></li>
+						</ul>
+					</details>
+				</li>
 			</ul>
 			@AddBookmarkModal()
 		</nav>

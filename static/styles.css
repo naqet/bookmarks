@@ -42,6 +42,7 @@
 }
 
 @media (min-width: 576px) {
+
     :root,
     :host {
         --pico-font-size: 106.25%;

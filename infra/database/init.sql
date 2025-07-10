@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS bookmarks (
     id uuid primary key default gen_random_uuid(),
-    ownerId uuid not null references users(id);
+    ownerId uuid not null references users(id),
     title text unique not null,
     description text,
     read boolean default false,

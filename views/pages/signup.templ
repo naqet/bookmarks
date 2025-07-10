@@ -1,0 +1,25 @@
+package pages;
+
+import "naqet/bookmarks/views/layouts"
+
+templ SignUp() {
+	@layouts.Root() {
+		<form hx-post="/api/auth/signup" hx-trigger="submit" hx-target-error="#errors">
+			<label>
+				Username
+				<input type="text" name="username" autocomplete="name" required/>
+			</label>
+			<label>
+				Password
+				<input type="password" name="password" autocomplete="new-password" required/>
+			</label>
+			<label>
+				Confirm password
+				<input type="password" name="password-confirm" required/>
+			</label>
+			<button type="submit">Sign up</button>
+            <small id="errors" style="display: block;"></small>
+			<a href="/login">Login</a>
+		</form>
+	}
+}

@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log/slog"
 	"naqet/bookmarks/infra/database"
+	"naqet/bookmarks/services/auth"
 	"naqet/bookmarks/views/pages"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 )
 
@@ -26,6 +28,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	vali := validator.New(validator.WithRequiredStructEnabled())
+
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -34,11 +38,16 @@ func main() {
 
 	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		if err := pages.Index().Render(context.Background(), w); err != nil {
-			fmt.Println(err)
-			w.Write([]byte("Error"))
-		}
+	auth.Init(r, db, vali)
+
+	r.Group(func(g chi.Router) {
+		g.Use(auth.NewMiddleware(db))
+		g.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			if err := pages.Index().Render(context.Background(), w); err != nil {
+				fmt.Println(err)
+				w.Write([]byte("Error"))
+			}
+		})
 	})
 
 	http.ListenAndServe(":3000", r)
