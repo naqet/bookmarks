@@ -72,7 +72,7 @@ func (h *marksHandler) getInfo(w http.ResponseWriter, r *http.Request) {
 	title := findTitle(n)
 	desc := findMeta(n, []string{"description", "og:description", "twitter:description"})
 
-	if err := components.AddBookmarkModalPageInfo(title, desc).Render(r.Context(), w); err != nil {
+	if err := components.BookmarkTitleAndDesc(title, desc).Render(r.Context(), w); err != nil {
 		utils.InternalServerError(w)
 		return
 	}
@@ -137,7 +137,30 @@ func (h *marksHandler) createMark(w http.ResponseWriter, r *http.Request) {
 
 func (h *marksHandler) getMark(w http.ResponseWriter, r *http.Request) {}
 
-func (h *marksHandler) updateMark(w http.ResponseWriter, r *http.Request) {
+func (h *marksHandler) getEditMarkModal(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value(utils.USER_ID_CTX_KEY).(string)
+
+	if !ok {
+		utils.Unauthorized(w)
+		return
+	}
+	id := r.PathValue("id")
+
+	mark := database.Bookmark{}
+
+	if err := h.db.QueryRow(
+		"select id, title, url, tags, description, read, created_at from bookmarks where owner_id = $1 and id = $2",
+		userId,
+		id,
+	).Scan(&mark.ID, &mark.Title, &mark.Url, &mark.Tags, &mark.Description, &mark.Read, &mark.CreatedAt); err != nil {
+		utils.BadRequest(w)
+		return
+	}
+
+	components.EditBookmarkModal(mark).Render(r.Context(), w)
+}
+
+func (h *marksHandler) editMark(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value(utils.USER_ID_CTX_KEY).(string)
 	if !ok {
 		utils.Unauthorized(w)
@@ -147,8 +170,8 @@ func (h *marksHandler) updateMark(w http.ResponseWriter, r *http.Request) {
 	type request struct {
 		Title       string `validate:"required"`
 		Url         string `validate:"required,url"`
-		Tags        string `validate:"required"`
-		Description string `validate:"required"`
+		Tags        string
+		Description string
 	}
 
 	data := request{

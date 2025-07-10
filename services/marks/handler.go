@@ -21,7 +21,9 @@ func Init(r chi.Router, db *sql.DB, vali *validator.Validate) *marksHandler {
 	r.Get("/api/marks/get-info", h.getInfo)
 
 	r.Get("/api/marks/{id}", h.getMark)
-	r.Put("/api/marks/{id}", h.updateMark)
+	r.Put("/api/marks/{id}", h.editMark)
 	r.Delete("/api/marks/{id}", h.deleteMark)
+
+	r.Get("/api/marks/edit-modal/{id}", h.getEditMarkModal)
 	return h
 }

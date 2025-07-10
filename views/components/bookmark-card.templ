@@ -11,8 +11,18 @@ templ BookmarkCard(mark database.Bookmark) {
 		{ mark.Description }
 		<footer>
 			<div role="group">
-				<button>Edit</button>
-				<button class="secondary" hx-delete={ fmt.Sprintf("/api/marks/%s", mark.ID) } hx-confirm="Are you sure?" hx-swap="delete" hx-target="closest article">Delete</button>
+				<button
+					hx-get={ fmt.Sprintf("/api/marks/edit-modal/%s", mark.ID) }
+					hx-on::after-request="if(event.detail.successful) document.getElementById('edit_bookmark_modal')?.showModal()"
+					hx-swap="afterend"
+				>Edit</button>
+				<button
+					class="secondary"
+					hx-delete={ fmt.Sprintf("/api/marks/%s", mark.ID) }
+					hx-confirm="Are you sure?"
+					hx-swap="delete"
+					hx-target="closest article"
+				>Delete</button>
 			</div>
 		</footer>
 	</article>

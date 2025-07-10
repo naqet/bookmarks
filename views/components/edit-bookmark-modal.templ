@@ -1,0 +1,35 @@
+package components;
+
+import "naqet/bookmarks/infra/database"
+import "fmt"
+
+templ EditBookmarkModal(mark database.Bookmark) {
+	<dialog id={ EDIT_BOOKMARK_MODAL } onclose="this.remove()">
+		<article>
+			<header style="display: flex; justify-content: space-between; align-items: center;">
+				<p>
+					<strong>🗓️ Edit bookmark</strong>
+				</p>
+				<form method="dialog">
+					<button aria-label="Close" rel="prev"></button>
+				</form>
+			</header>
+			<form hx-trigger="submit" hx-put={ fmt.Sprintf("/api/marks/%s", mark.ID) } hx-target-error="#errors">
+				<label>
+					URL
+					<input type="url" name="url" required value={ mark.Url } hx-get="/api/marks/get-info" hx-trigger="input changed delay:500ms" hx-target-error="#url-helper" hx-target="#page-info" aria-describedby="url-helper"/>
+					<small id="url-helper"></small>
+				</label>
+				<label>
+					Tags
+					<input type="text" name="tags" value={ mark.Tags }/>
+				</label>
+				<fieldset id="page-info">
+					@BookmarkTitleAndDesc(mark.Title, mark.Description)
+				</fieldset>
+				<button type="submit" style="margin-bottom: 0;">Edit</button>
+				<small id="errors" style="display:block;"></small>
+			</form>
+		</article>
+	</dialog>
+}
