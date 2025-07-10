@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"log/slog"
+	"naqet/bookmarks/utils"
 	"net/http"
 	"os"
 
@@ -14,7 +15,7 @@ import (
 func NewMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie("Authorization")
+			cookie, err := r.Cookie(utils.AUTHORIZATION)
 
 			if err != nil || cookie == nil {
 				w.Header().Add("Location", "/login")
@@ -66,7 +67,7 @@ func NewMiddleware(db *sql.DB) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), "id", id)
+			ctx := context.WithValue(r.Context(), utils.USER_ID_CTX_KEY, id)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

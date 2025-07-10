@@ -1,54 +1,21 @@
 package pages;
 
 import "naqet/bookmarks/views/layouts"
+import "naqet/bookmarks/infra/database"
 
-type Link struct {
-	title       string
-	href        string
-	description string
-}
-
-var links = []Link{
-	{
-		title:       "google",
-		description: "Molestiae explicabo qui dolorem quia harum hic. Sed mollitia voluptate et cum. Magni quas nulla qui et cum maxime. Eum perferendis omnis et libero molestiae occaecati expedita quia.",
-		href:        "http://google.com",
-	},
-	{
-		title:       "google",
-		description: "Molestiae explicabo qui dolorem quia harum hic. Sed mollitia voluptate et cum. Magni quas nulla qui et cum maxime. Eum perferendis omnis et libero molestiae occaecati expedita quia.",
-		href:        "http://google.com",
-	},
-	{
-		title:       "google",
-		description: "Molestiae explicabo qui dolorem quia harum hic. Sed mollitia voluptate et cum. Magni quas nulla qui et cum maxime. Eum perferendis omnis et libero molestiae occaecati expedita quia.",
-		href:        "http://google.com",
-	},
-	{
-		title:       "google",
-		description: "Molestiae explicabo qui dolorem quia harum hic. Sed mollitia voluptate et cum. Magni quas nulla qui et cum maxime. Eum perferendis omnis et libero molestiae occaecati expedita quia.",
-		href:        "http://google.com",
-	},
-	{
-		title:       "google",
-		description: "Molestiae explicabo qui dolorem quia harum hic. Sed mollitia voluptate et cum. Magni quas nulla qui et cum maxime. Eum perferendis omnis et libero molestiae occaecati expedita quia.",
-		href:        "http://google.com",
-	},
-}
-
-templ Index() {
+templ Index(marks []database.Bookmark) {
 	@layouts.Root() {
 		<form role="search">
 			<input name="search" type="search" placeholder="Search"/>
 			<input type="submit" value="Search"/>
 		</form>
 		<hr/>
-		for _, link := range links {
+		for _, mark := range marks {
 			<article>
 				<header style="display: flex; align-items: center; gap: var(--pico-block-spacing-horizontal);">
-					<div style="width: 20px; aspect-ratio: 1/1; background: darkgray;"/><a href={ link.href } target="_blank">{ link.title }</a>
+					<div style="width: 20px; aspect-ratio: 1/1; background: darkgray;"></div><a href={ mark.Url } target="_blank">{ mark.Title }</a>
 				</header>
-				{ link.description }
+				{ mark.Description }
 				<footer>
 					<div role="group">
 						<button>Edit</button>

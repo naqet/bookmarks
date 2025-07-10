@@ -3,7 +3,6 @@ package auth
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log/slog"
 	"naqet/bookmarks/infra/database"
 	"naqet/bookmarks/utils"
@@ -25,8 +24,8 @@ func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 		Username: r.PostFormValue("username"),
 		Password: r.PostFormValue("password"),
 	}
-	fmt.Println(data)
-	if err := h.vali.Struct(data); err != nil {
+
+	if err := h.vali.Struct(&data); err != nil {
 		utils.BadRequest(w, err.Error())
 		return
 	}
@@ -48,7 +47,7 @@ func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 	expiration := time.Now().Add(time.Hour)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":  "id",
+		"sub":  user.ID,
 		"time": expiration.Unix(),
 	})
 
@@ -67,7 +66,7 @@ func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := http.Cookie{
-		Name:     "Authorization",
+		Name:     utils.AUTHORIZATION,
 		Value:    tokenString,
 		Path:     "/",
 		Expires:  expiration,
@@ -98,7 +97,7 @@ func (h *authHandler) signUp(w http.ResponseWriter, r *http.Request) {
 		PasswordConfirm: r.PostFormValue("password-confirm"),
 	}
 
-	if err := h.vali.Struct(data); err != nil {
+	if err := h.vali.Struct(&data); err != nil {
 		utils.BadRequest(w, err.Error())
 		return
 	}
@@ -140,7 +139,7 @@ func (h *authHandler) signUp(w http.ResponseWriter, r *http.Request) {
 
 func (h *authHandler) logout(w http.ResponseWriter, r *http.Request) {
 	cookie := http.Cookie{
-		Name:     "Authorization",
+		Name:     utils.AUTHORIZATION,
 		Value:    "",
 		Path:     "/",
 		MaxAge:   -1,

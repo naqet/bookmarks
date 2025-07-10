@@ -11,23 +11,19 @@ templ AddBookmarkModal() {
 					<button aria-label="Close" rel="prev"></button>
 				</form>
 			</header>
-			<form>
+			<form hx-trigger="submit" hx-post="/api/marks">
 				<label>
 					URL
-					<input type="url" name="url" required/>
+					<input type="url" name="url" required hx-get="/api/marks/get-info" hx-trigger="input changed delay:500ms" hx-target-error="#url-helper" hx-target="#page-info" aria-describedby="url-helper"/>
+					<small id="url-helper"></small>
 				</label>
 				<label>
 					Tags
 					<input type="text" name="tags"/>
 				</label>
-				<label>
-					Title
-					<input type="text" name="title" required/>
-				</label>
-				<label>
-					Description
-					<textarea rows="4" name="description"></textarea>
-				</label>
+				<fieldset id="page-info">
+					@AddBookmarkModalPageInfo("", "")
+				</fieldset>
 				<button type="submit" style="margin-bottom: 0;">Add</button>
 			</form>
 		</article>

@@ -1,0 +1,12 @@
+package components;
+
+templ AddBookmarkModalPageInfo(title, description string) {
+	<label>
+		Title
+		<input type="text" name="title" required value={ title }/>
+	</label>
+	<label>
+		Description
+		<textarea rows="4" name="description">{ description }</textarea>
+	</label>
+}
