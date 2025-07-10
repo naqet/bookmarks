@@ -50,7 +50,7 @@ func main() {
 				return
 			}
 			marks := []database.Bookmark{}
-			res, err := db.Query("select title, url, tags, description, read, created_at from bookmarks where owner_id = $1", userId)
+			res, err := db.Query("select id, title, url, tags, description, read, created_at from bookmarks where owner_id = $1", userId)
 
 			if err != nil {
 				slog.Error("couldn't prepare query for selecting bookmarks", slog.Any("error", err))
@@ -60,7 +60,7 @@ func main() {
 
 			for res.Next() {
 				mark := database.Bookmark{}
-				err := res.Scan(&mark.Title, &mark.Url, &mark.Tags, &mark.Description, &mark.Read, &mark.CreatedAt)
+				err := res.Scan(&mark.ID, &mark.Title, &mark.Url, &mark.Tags, &mark.Description, &mark.Read, &mark.CreatedAt)
 
 				if err != nil {
 					slog.Error("couldn't scan bookmark", slog.Any("error", err))

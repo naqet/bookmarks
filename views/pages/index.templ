@@ -2,27 +2,16 @@ package pages;
 
 import "naqet/bookmarks/views/layouts"
 import "naqet/bookmarks/infra/database"
+import "naqet/bookmarks/views/components"
 
 templ Index(marks []database.Bookmark) {
 	@layouts.Root() {
-		<form role="search">
-			<input name="search" type="search" placeholder="Search"/>
-			<input type="submit" value="Search"/>
-		</form>
+		<input name="query" type="search" placeholder="Search" hx-trigger="input changed delay:500ms" hx-target="#list" hx-get="/api/marks"/>
 		<hr/>
-		for _, mark := range marks {
-			<article>
-				<header style="display: flex; align-items: center; gap: var(--pico-block-spacing-horizontal);">
-					<div style="width: 20px; aspect-ratio: 1/1; background: darkgray;"></div><a href={ mark.Url } target="_blank">{ mark.Title }</a>
-				</header>
-				{ mark.Description }
-				<footer>
-					<div role="group">
-						<button>Edit</button>
-						<button class="secondary">Delete</button>
-					</div>
-				</footer>
-			</article>
-		}
+		<div id="list">
+			for _, mark := range marks {
+				@components.BookmarkCard(mark)
+			}
+		</div>
 	}
 }

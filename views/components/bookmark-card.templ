@@ -1,0 +1,19 @@
+package components;
+
+import "naqet/bookmarks/infra/database"
+import "fmt"
+
+templ BookmarkCard(mark database.Bookmark) {
+	<article>
+		<header style="display: flex; align-items: center; gap: var(--pico-block-spacing-horizontal);">
+			<div style="width: 20px; aspect-ratio: 1/1; background: darkgray;"></div><a href={ mark.Url } target="_blank">{ mark.Title }</a>
+		</header>
+		{ mark.Description }
+		<footer>
+			<div role="group">
+				<button>Edit</button>
+				<button class="secondary" hx-delete={ fmt.Sprintf("/api/marks/%s", mark.ID) } hx-confirm="Are you sure?" hx-swap="delete" hx-target="closest article">Delete</button>
+			</div>
+		</footer>
+	</article>
+}

@@ -8,6 +8,7 @@ import (
 	"naqet/bookmarks/utils"
 	"naqet/bookmarks/views/components"
 	"net/http"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -19,7 +20,11 @@ func (h *marksHandler) getMarks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	marks := []database.Bookmark{}
-	res, err := h.db.Query("select title, url, tags, description, read, created_at from bookmarks where owner_id = $1", userId)
+
+	queryValues := r.URL.Query()
+	query := strings.ToLower(queryValues.Get("query"))
+
+	res, err := h.db.Query("select id, title, url, tags, description, read, created_at from bookmarks where owner_id = $1 and lower(title) like $2", userId, "%"+query+"%")
 
 	if err != nil {
 		slog.Error("couldn't prepare query for selecting bookmarks", slog.Any("error", err))
@@ -29,7 +34,7 @@ func (h *marksHandler) getMarks(w http.ResponseWriter, r *http.Request) {
 
 	for res.Next() {
 		mark := database.Bookmark{}
-		err := res.Scan(&mark.Title, &mark.Url, &mark.Tags, &mark.Description, &mark.Read, &mark.CreatedAt)
+		err := res.Scan(&mark.ID, &mark.Title, &mark.Url, &mark.Tags, &mark.Description, &mark.Read, &mark.CreatedAt)
 
 		if err != nil {
 			slog.Error("couldn't scan bookmark", slog.Any("error", err))
@@ -39,6 +44,8 @@ func (h *marksHandler) getMarks(w http.ResponseWriter, r *http.Request) {
 
 		marks = append(marks, mark)
 	}
+
+	components.BookmarkCards(marks).Render(r.Context(), w)
 }
 
 func (h *marksHandler) getInfo(w http.ResponseWriter, r *http.Request) {
@@ -130,4 +137,33 @@ func (h *marksHandler) createMark(w http.ResponseWriter, r *http.Request) {
 
 func (h *marksHandler) getMark(w http.ResponseWriter, r *http.Request)    {}
 func (h *marksHandler) updateMark(w http.ResponseWriter, r *http.Request) {}
-func (h *marksHandler) deleteMark(w http.ResponseWriter, r *http.Request) {}
+func (h *marksHandler) deleteMark(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value(utils.USER_ID_CTX_KEY).(string)
+	if !ok {
+		utils.Unauthorized(w)
+		return
+	}
+
+	id := r.PathValue("id")
+
+	var exists bool
+	if err := h.db.QueryRow("select exists(select 1 from bookmarks where id = $1 and owner_id = $2)", id, userId).Scan(&exists); err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			utils.BadRequest(w)
+			return
+		}
+	}
+
+	if !exists {
+		utils.BadRequest(w)
+		return
+	}
+
+	if _, err := h.db.Exec("delete from bookmarks where id = $1 and owner_id = $2", id, userId); err != nil {
+		utils.BadRequest(w)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
+	w.Write([]byte(http.StatusText(http.StatusAccepted)))
+}

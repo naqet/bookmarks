@@ -1,0 +1,9 @@
+package components;
+
+import "naqet/bookmarks/infra/database"
+
+templ BookmarkCards(marks []database.Bookmark) {
+	for _, mark := range marks {
+		@BookmarkCard(mark)
+	}
+}
