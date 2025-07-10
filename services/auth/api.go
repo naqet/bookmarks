@@ -77,9 +77,9 @@ func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	// if utils.IsHtmxRequest(r) {
-	// 	utils.AddHtmxRedirect(w, "/dashboard")
-	// }
+	if utils.IsHtmxRequest(r) {
+		utils.SetHtmxRedirect(w, "/")
+	}
 
 	w.Write([]byte(http.StatusText(http.StatusOK)))
 }
@@ -129,9 +129,9 @@ func (h *authHandler) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if utils.IsHtmxRequest(r) {
-	// 	utils.AddHtmxRedirect(w, "/auth/login")
-	// }
+	if utils.IsHtmxRequest(r) {
+		utils.SetHtmxRedirect(w, "/login")
+	}
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(http.StatusText(http.StatusCreated)))
@@ -150,9 +150,9 @@ func (h *authHandler) logout(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	// if utils.IsHtmxRequest(r) {
-	// 	utils.AddHtmxRedirect(w, "/")
-	// }
-	//
+	if utils.IsHtmxRequest(r) {
+		utils.SetHtmxRedirect(w, "/")
+	}
+
 	w.Write([]byte(http.StatusText(http.StatusOK)))
 }

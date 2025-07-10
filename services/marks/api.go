@@ -135,8 +135,53 @@ func (h *marksHandler) createMark(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(http.StatusText(http.StatusCreated)))
 }
 
-func (h *marksHandler) getMark(w http.ResponseWriter, r *http.Request)    {}
-func (h *marksHandler) updateMark(w http.ResponseWriter, r *http.Request) {}
+func (h *marksHandler) getMark(w http.ResponseWriter, r *http.Request) {}
+
+func (h *marksHandler) updateMark(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value(utils.USER_ID_CTX_KEY).(string)
+	if !ok {
+		utils.Unauthorized(w)
+		return
+	}
+
+	type request struct {
+		Title       string `validate:"required"`
+		Url         string `validate:"required,url"`
+		Tags        string `validate:"required"`
+		Description string `validate:"required"`
+	}
+
+	data := request{
+		Url:         r.PostFormValue("url"),
+		Tags:        r.PostFormValue("tags"),
+		Title:       r.PostFormValue("title"),
+		Description: r.PostFormValue("description"),
+	}
+
+	if err := h.vali.Struct(&data); err != nil {
+		utils.BadRequest(w, err.Error())
+		return
+	}
+
+	id := r.PathValue("id")
+
+	if _, err := h.db.Exec(
+		"update bookmarks set title = $1, url = $2, tags = $3, description = $4 where id = $5 and owner_id = $6",
+		data.Title,
+		data.Url,
+		data.Tags,
+		data.Description,
+		id,
+		userId,
+	); err != nil {
+		utils.BadRequest(w, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
+	w.Write([]byte(http.StatusText(http.StatusAccepted)))
+}
+
 func (h *marksHandler) deleteMark(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value(utils.USER_ID_CTX_KEY).(string)
 	if !ok {
