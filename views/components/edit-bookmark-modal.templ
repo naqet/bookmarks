@@ -23,6 +23,7 @@ templ EditBookmarkModal(mark database.Bookmark) {
 				<label>
 					Tags
 					<input type="text" name="tags" value={ mark.Tags }/>
+					<small>Enter tags separated by ", "</small>
 				</label>
 				<fieldset id="page-info">
 					@BookmarkTitleAndDesc(mark.Title, mark.Description)

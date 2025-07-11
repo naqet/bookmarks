@@ -2,11 +2,24 @@ package components;
 
 import "naqet/bookmarks/infra/database"
 import "fmt"
+import "strings"
 
 templ BookmarkCard(mark database.Bookmark) {
 	<article>
-		<header style="display: flex; align-items: center; gap: var(--pico-block-spacing-horizontal);">
-			<div style="width: 20px; aspect-ratio: 1/1; background: darkgray;"></div><a href={ mark.Url } target="_blank">{ mark.Title }</a>
+		<header style="display: flex; justify-content: space-between; align-items: center;">
+			<div style="display: flex; align-items: center; gap: var(--pico-block-spacing-horizontal);">
+				<div style="width: 20px; aspect-ratio: 1/1; background: darkgray;"></div>
+				<a href={ mark.Url } target="_blank">{ mark.Title }</a>
+			</div>
+			if len(mark.Tags) > 0 {
+				<ul style="margin: 0; padding: 0; display: flex; gap: var(--pico-block-spacing-horizontal);">
+					for _, tag := range strings.Split(mark.Tags, ", ") {
+						<li style="list-style: none">
+							<a href={ fmt.Sprintf("/?tags=%s", tag) }>#{ tag }</a>
+						</li>
+					}
+				</ul>
+			}
 		</header>
 		{ mark.Description }
 		<footer>
@@ -14,7 +27,8 @@ templ BookmarkCard(mark database.Bookmark) {
 				<button
 					hx-get={ fmt.Sprintf("/api/marks/edit-modal/%s", mark.ID) }
 					hx-on::after-request="if(event.detail.successful) document.getElementById('edit_bookmark_modal')?.showModal()"
-					hx-swap="afterend"
+					hx-swap="beforeend"
+                    hx-target="body"
 				>Edit</button>
 				<button
 					class="secondary"

@@ -1,11 +1,13 @@
 package dashboard
 
 import (
+	"fmt"
 	"log/slog"
 	"naqet/bookmarks/infra/database"
 	"naqet/bookmarks/utils"
 	"naqet/bookmarks/views/pages"
 	"net/http"
+	"strings"
 )
 
 func (h *dashboardHandler) homePage(w http.ResponseWriter, r *http.Request) {
@@ -14,8 +16,12 @@ func (h *dashboardHandler) homePage(w http.ResponseWriter, r *http.Request) {
 		utils.Unauthorized(w)
 		return
 	}
+
+	query := r.URL.Query()
+	tags := strings.ToLower("%" + query.Get("tags") + "%")
+	fmt.Println(query.Get("tags"))
 	marks := []database.Bookmark{}
-	res, err := h.db.Query("select id, title, url, tags, description, read, created_at from bookmarks where owner_id = $1", userId)
+	res, err := h.db.Query("select id, title, url, tags, description, read, created_at from bookmarks where owner_id = $1 and lower(tags) like $2", userId, tags)
 
 	if err != nil {
 		slog.Error("couldn't prepare query for selecting bookmarks", slog.Any("error", err))
